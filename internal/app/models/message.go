@@ -2,6 +2,11 @@ package models
 
 import "time"
 
+type Response struct {
+	Token string `json:"token"`
+	Message
+}
+
 type Message struct {
 	CreatedAt      time.Time `json:"created_at"`
 	SenderID       uint      `json:"sender_id"`
