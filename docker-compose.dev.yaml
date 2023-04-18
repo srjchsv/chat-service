@@ -1,20 +1,11 @@
 version: "3.9"
 services:
-  myapp:
-    build: .
-    env_file:
-      - .env
-    ports:
-      - "${PORT}:${PORT}"
-    depends_on:
-      - kafka
-      - db
   db:
     image: postgres:15.2-alpine
-    container_name: postgres
+    container_name: chat-db
     restart: always
     env_file:
-      - .env
+      - dev.env
     ports:
      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
@@ -28,23 +19,25 @@ services:
     depends_on:
       - zookeeper
     env_file:
-      - .env
+      - dev.env
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${BROKER_HOST}:${BROKER_PORT},PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT:/${BROKER_HOST}:${BROKER_PORT},PLAINTEXT_INTERNAL://broker:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'status' | nc localhost 9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 3 
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.0.0
+    image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 volumes:
   db-data:
-networks:
-  default:
-    external: true
-    name: my_shared_network
+

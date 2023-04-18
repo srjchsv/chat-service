@@ -18,12 +18,12 @@ func main() {
 	}
 
 	// Initialize the Kafka producer
-	producer, err := broker.InitProducer(os.Getenv("KAFKA_HOST"))
+	producer, err := broker.InitProducer(os.Getenv("BROKER_HOST"))
 	if err != nil {
 		log.Fatalf("Failed to initialize Kafka producer: %v", err)
 	}
 
 	defer producer.Close()
 	router := routes.SetupRouter(db, producer)
-	log.Fatal(router.Run(":8000"))
+	log.Fatal(router.Run(":" + os.Getenv("PORT")))
 }
