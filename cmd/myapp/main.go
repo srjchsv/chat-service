@@ -18,7 +18,8 @@ func main() {
 	}
 
 	// Initialize the Kafka producer
-	producer, err := broker.InitProducer(os.Getenv("BROKER_HOST"))
+	brokerInitTimeout := time.Second * 60
+	producer, err := broker.InitProducer(os.Getenv("BROKER_HOST"), brokerInitTimeout)
 	if err != nil {
 		log.Fatalf("Failed to initialize Kafka producer: %v", err)
 	}
