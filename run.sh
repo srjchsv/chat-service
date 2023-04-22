@@ -1,5 +1,7 @@
 #!/bin/bash
 
+imageName="chat-service"
+
 if [[ $1 == "dev" ]]; then
     # Load environment variables from dev.env file
     source dev.env
@@ -29,7 +31,17 @@ elif [[ $1 == "compose" ]]; then
     # Stop the containers
     docker compose down
 
+elif [[ $1 == "build" ]]; then
+    # Build image
+    docker build -t $imageName .
+
+elif [[ $1 == "push" ]]; then
+    # Tag image
+    docker tag $imageName srjchsv/$imageName
+
+    # Push image to remote registry
+    docker push srjchsv/$imageName
 
 else
-    echo "Invalid argument. Please specify either 'dev' or 'compose'"
+    echo "Invalid argument."
 fi
